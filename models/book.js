@@ -1,14 +1,11 @@
-// const uuidv4 = require('uuid/v4');
 const mongoose = require('mongoose');
-// const uuid = require('mongoose-uuid');
-// require('mongoose-uuid2')(mongoose);
 const { v4: uuidv4 } = require('uuid');
-// const uuid = require('uuid-mongodb');
+
 
 const bookSchema = mongoose.Schema({
     _id: {type: String, default: uuidv4()},
     name: String,
-    // type:
+    type: String,
     }, {id: false});
 
 // bookSchema.set('toObject', {getters: true});

@@ -51,7 +51,7 @@ app.use((error, req, res, next) => {
 });
 
 //connect to db
-mongoose.connect(process.env.DB_CONNECTION);
+mongoose.connect(process.env.DB_CONNECTION,()=> console.log('connected to db'));
 
 // app.get('/', (req, res)=> {
 //     res.send('hello world')
