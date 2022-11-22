@@ -1,28 +1,16 @@
 const express = require('express');
 const router = express.Router();
+const bookstoreController = require('../controllers/bookstoreController')
+const publishingHousesController = require("../controllers/publisherHousesController");
 
-router.get('/', (req, res, next) => {
-    res.status(200).json({
-        message: 'handling GET method on bookstore'
-    });
-});
+router.get('/', bookstoreController.getAllBookstores);
 
-router.post('/', (req, res, next) => {
-    res.status(200).json({
-        message: 'handling POST method on bookstore'
-    });
-});
+router.post('/', bookstoreController.createNewBookstore);
 
-router.patch('/', (req, res, next) => {
-    res.status(200).json({
-        message: 'handling PATCH method - updated bookstore'
-    });
-});
-//czy jest jedna ksiegarnia? a jezeli jest jedna ksiegarnia to do usuwania potrzebne mi id?
-router.delete('/', (req, res, next) => {
-    res.status(200).json({
-        message: 'handling DELETE method - deleted bookstore'
-    });
-});
+router.get('/:bookstoreId', bookstoreController.getBookstore);
+
+router.patch('/:bookstoreId', bookstoreController.updateBookstore);
+
+router.delete('/:bookstoreId', bookstoreController.deleteBookstore);
 
 module.exports = router;

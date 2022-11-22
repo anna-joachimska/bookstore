@@ -1,40 +1,15 @@
 const express = require('express');
 const router = express.Router();
+const publishingHousesController = require('../controllers/publisherHousesController')
 
-router.get('/', (req, res, next) => {
-    res.status(200).json({
-        message: 'handling GET method on publishing houses'
-    });
-});
+router.get('/', publishingHousesController.getAllPublishingHouses);
 
-router.post('/', (req, res, next) => {
-    res.status(200).json({
-        message: 'handling POST method on publishing house'
-    });
-});
+router.post('/', publishingHousesController.createNewPublishingHouse);
 
-router.get('/:publishingHouseId', (req, res, next) => {
-    const id = req.params.bookId;
-    res.status(200).json({
-        message: 'get a specific publishingHouse endpoint',
-        id: id,
-    });
-});
+router.get('/:publishingHouseId', publishingHousesController.getPublishingHouse);
 
-router.patch('/:publishingHouseId', (req, res, next) => {
-    const id = req.params.publishingHouseId;
-    res.status(200).json({
-        message: 'handling PATCH method - updated publishingHouse',
-        id: id,
-    });
-});
+router.patch('/:publishingHouseId', publishingHousesController.updatePublishingHouse);
 
-router.delete('/:publishingHouseId', (req, res, next) => {
-    const id = req.params.publishingHouseId;
-    res.status(200).json({
-        message: 'handling DELETE method - deleted publishingHouse',
-        id: id,
-    });
-});
+router.delete('/:publishingHouseId', publishingHousesController.deletePublishingHouse);
 
 module.exports = router;
