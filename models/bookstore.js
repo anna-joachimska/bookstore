@@ -1,11 +1,10 @@
 const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
 
 const bookstoreSchema = mongoose.Schema({
-    _id: {type: String, default: uuidv4()},
+    _id: new mongoose.Schema.Types.ObjectId,
     name: {type: String, required: true, unique: true},
-    publishingHouse: {type: String, ref: 'PublishingHouse'},
-    book: {type: String, ref: 'Book'}
-}, {id: false});
+    publishingHouses: [{type: mongoose.Types.ObjectId, ref: 'PublishingHouse'}],
+    books: [{type: mongoose.Types.ObjectId, ref: 'Book'}]
+});
 
 module.exports = mongoose.model('Bookstore', bookstoreSchema);
