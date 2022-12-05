@@ -1,4 +1,7 @@
+
+//TODO: ta funkcja jest zbędna, mozna uzyc po prostu Model.findOne tam gdzie trzeba i wziac potem _id
 const findByName = async (model, dataName) => {
+    console.log(dataName);
     if (!dataName) {
         return null
     }
@@ -6,8 +9,7 @@ const findByName = async (model, dataName) => {
     if (!data) {
         return null
     }
-    const dataId = data._id
-    return dataId
+    return  data._id
 }
 
 module.exports = {findByName}

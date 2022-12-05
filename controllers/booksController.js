@@ -16,7 +16,6 @@ const getAllBooks = async (req, res) => {
 
 const createNewBook = async (req, res) => {
     const book = new Book({
-        _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
         type: req.body.type,
     });

@@ -5,7 +5,7 @@ const {findByName} = require("../functions/findFunctions");
 
 const getAllPublishingHouses = async (req, res) => {
     try {
-        const data = await PublishingHouse.find();
+        const data = await PublishingHouse.find().populate('books');
         res.json(data);
     } catch (error) {
         res.status(500).json({message: error.message})
@@ -14,8 +14,7 @@ const getAllPublishingHouses = async (req, res) => {
 
 const createNewPublishingHouse = async (req, res) => {
     const publishingHouse = await new PublishingHouse({
-        _id: new mongoose.Types.ObjectId(),
-        name: req.body.name,
+        name: req.body.name
     });
     try {
         const data = await publishingHouse.save();
@@ -63,6 +62,7 @@ const addBookToPublishingHouse = async (req, res) => {
         const publishingHouse = await PublishingHouse.findById(req.params.publishingHouseId);
         const bookName = req.body.books
         const newBook = await findByName(Book, bookName)
+        //TODO: do kosza, ten IF jest zbędny + niepoprawny, books nigdy nie jest nullem, zawsze na starcie będzie pustą tablicą
         if (publishingHouse.books == null || publishingHouse.books.length<1) {
             publishingHouse.books = []
         };
@@ -79,18 +79,19 @@ const addBookToPublishingHouse = async (req, res) => {
 
 const deleteBookFromPublisherHouse = async (req, res) => {
     try {
-        const publishingHouse = await PublishingHouse.findById(req.params.publishingHouseId);
-        const bookName = req.body.books
-        const deletedBook = await findByName(Book, bookName);
-        // return await PublishingHouse.findOneAndUpdate(
-        //     { _id: publishingHouse._id },
-        //     { $pull: { books: { _id: deletedBook } }},
-        //     { new: true });
-        const result = await publishingHouse.updateOne({ $pull: { books: {_id: deletedBook}}})
-        await publishingHouse.save()
-        console.log(result)
-        res.send(publishingHouse)
+
+        const book = await Book.findOne({name: req.body.books});
+        if(!book) return res.status(404).json({message: 'Book not found'});
+
+        const publishingHouse = await PublishingHouse.findByIdAndUpdate(
+            {_id: req.params.publishingHouseId},
+            { $pull: { books: book._id }},
+            { new: true }).populate('books');
+
+        return res.send(publishingHouse);
+
     } catch (error) {
+        //TODO, popracuj nad odpowiednimi kodami w odpowiedzi i obsługą błędów
         res.status(400).json({message:error.message});
     }
 }

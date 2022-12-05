@@ -18,7 +18,6 @@ const createNewBookstore = async (req, res) => {
     const publishingHouseId = await findFunctions.findByName(PublishingHouse, req.body.publishingHouses);
     console.log(bookId, publishingHouseId);
     const bookstore = new Bookstore({
-        _id: new mongoose.Types.ObjectId,
         name: req.body.name,
         books: bookId,
         publishingHouses: publishingHouseId
