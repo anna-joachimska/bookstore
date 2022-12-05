@@ -15,14 +15,10 @@ const getAllBooks = async (req, res) => {
 }
 
 const createNewBook = async (req, res) => {
-    const bookstoreId = await findFunctions.findByName(Bookstore, req.body.bookstores);
-    const publishingHouseId = await findFunctions.findByName(PublishingHouse, req.body.publishingHouses);
     const book = new Book({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
         type: req.body.type,
-        publishingHouse: publishingHouseId,
-        bookstores: bookstoreId
     });
     try {
         const data = await book.save();
@@ -43,9 +39,9 @@ const getBook = async (req, res) => {
 const updateBook = async (req, res) => {
     try {
         const id = req.params.bookId;
-        const updatedData = req.body;
+        const dataToUpdate = req.body;
         const options = {new: true}; //obiekt zostanie zwrocony po updacie
-        const result = await Book.findByIdAndUpdate(id, updatedData, options)
+        const result = await Book.findByIdAndUpdate(id, dataToUpdate, options)
         res.send(result);
     } catch (error) {
         res.status(400).json({message: error.message});

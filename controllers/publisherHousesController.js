@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const PublishingHouse = require("../models/publishingHouse");
-const findFunctions = require("../functions/findFunctions");
 const Book = require("../models/book");
+const {findByName} = require("../functions/findFunctions");
 
 const getAllPublishingHouses = async (req, res) => {
     try {
@@ -13,12 +13,9 @@ const getAllPublishingHouses = async (req, res) => {
 }
 
 const createNewPublishingHouse = async (req, res) => {
-
-    const bookId = await findFunctions.findByName(Book, req.body.books);
-    const publishingHouse = new PublishingHouse({
+    const publishingHouse = await new PublishingHouse({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
-        books: bookId
     });
     try {
         const data = await publishingHouse.save();
@@ -31,7 +28,7 @@ const createNewPublishingHouse = async (req, res) => {
 
 const getPublishingHouse = async (req, res) => {
     try {
-        const data = await PublishingHouse.findById(req.params.publishingHouseUUID);
+        const data = await PublishingHouse.findById(req.params.publishingHouseId);
         res.json(data);
     } catch (error) {
         res.status(500).json({message: error.message})
@@ -43,7 +40,8 @@ const updatePublishingHouse = async (req, res) => {
         const id = req.params.publishingHouseId;
         const updatedData = req.body;
         const options = {new: true}; //obiekt zostanie zwrocony po updacie
-        const result = await PublishingHouse.findByIdAndUpdate(id, updatedData, options);
+        const result = await PublishingHouse.findByIdAndUpdate(id, {updatedData}, options);
+        console.log(result)
         res.send(result);
     } catch (error) {
         res.status(400).json({message: error.message});
@@ -60,10 +58,49 @@ const deletePublishingHouse = async (req, res) => {
     }
 }
 
+const addBookToPublishingHouse = async (req, res) => {
+    try {
+        const publishingHouse = await PublishingHouse.findById(req.params.publishingHouseId);
+        const bookName = req.body.books
+        const newBook = await findByName(Book, bookName)
+        if (publishingHouse.books == null || publishingHouse.books.length<1) {
+            publishingHouse.books = []
+        };
+        if (!publishingHouse.books.includes(newBook._id)) {
+            await publishingHouse.books.push(newBook._id);
+            publishingHouse.save();
+            return res.send(publishingHouse);
+        };
+        console.log('book is already added in publishing house')
+    } catch (error) {
+        res.status(400).json({message:error.message});
+    }
+}
+
+const deleteBookFromPublisherHouse = async (req, res) => {
+    try {
+        const publishingHouse = await PublishingHouse.findById(req.params.publishingHouseId);
+        const bookName = req.body.books
+        const deletedBook = await findByName(Book, bookName);
+        // return await PublishingHouse.findOneAndUpdate(
+        //     { _id: publishingHouse._id },
+        //     { $pull: { books: { _id: deletedBook } }},
+        //     { new: true });
+        const result = await publishingHouse.updateOne({ $pull: { books: {_id: deletedBook}}})
+        await publishingHouse.save()
+        console.log(result)
+        res.send(publishingHouse)
+    } catch (error) {
+        res.status(400).json({message:error.message});
+    }
+}
+
 module.exports = {
     getAllPublishingHouses,
     createNewPublishingHouse,
     getPublishingHouse,
     updatePublishingHouse,
-    deletePublishingHouse
+    deletePublishingHouse,
+    addBookToPublishingHouse,
+    deleteBookFromPublisherHouse
 }

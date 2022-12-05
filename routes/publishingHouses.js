@@ -12,4 +12,8 @@ router.patch('/:publishingHouseId', publishingHousesController.updatePublishingH
 
 router.delete('/:publishingHouseId', publishingHousesController.deletePublishingHouse);
 
+router.patch('/deleteBookFromPublishingHouse/:publishingHouseId', publishingHousesController.deleteBookFromPublisherHouse);
+
+router.patch('/addBookToPublishingHouse/:publishingHouseId', publishingHousesController.addBookToPublishingHouse);
+
 module.exports = router;
