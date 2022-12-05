@@ -1,5 +1,8 @@
 const findByName = async (model, dataName) => {
-    const data = await model.findOne(dataName)
+    if (!dataName) {
+        return null
+    }
+    const data = await model.findOne({name:dataName});
     if (!data) {
         return null
     }
