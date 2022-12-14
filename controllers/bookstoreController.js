@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Bookstore = require("../models/bookstore");
 const Book = require('../models/book');
 const PublishingHouse = require('../models/publishingHouse');
+const {validateNewObject} = require("../validation/createNewObjectValidation");
 
 const getAllBookstores = async (req, res) => {
     try {
@@ -31,10 +32,11 @@ const getAllBookstoresWithPublishingHouses = async (req, res) => {
 }
 
 const createNewBookstore = async (req, res) => {
-    const bookstore = await new Bookstore({
-        name: req.body.name,
-    });
     try {
+        const validateNewBookstore = await validateNewObject(Bookstore,req.body);
+        const bookstore = await new Bookstore({
+            name: req.body.name,
+        });
         const data = await bookstore.save();
         res.status(200).json(data)
     }

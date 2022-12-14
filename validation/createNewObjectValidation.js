@@ -1,25 +1,31 @@
 const validator = require('validator');
-const {ValidationError} = require("class-validator");
+const Book = require('../models/book');
 
-const validateNewObject = async (body) => {
+const validateNewObject = async (model, body) => {
+    const foundNameInDataBase = await model.findOne({name: body.name});
+    if (foundNameInDataBase) {
+        throw new Error('object already exist in database')
+    }
     if(validator.isEmpty(body.name)) {
-        throw new ValidationError('name field cannot be empty');
+        throw new Error('name field cannot be empty');
     }
     if(!validator.isLength(body.name, {min:3, max:50})){
-        throw new ValidationError('wrong length of name field');
+        throw new Error('wrong length of name field');
     }
-    if(validator.isEmpty(body.type)) {
-        throw new ValidationError('type field cannot be empty')
-    }
-    if(!validator.isLength(body.type, {min:3, max:50})){
-        throw new ValidationError('wrong length of type field');
-    }
-    const types = ['Kryminał', "Dramat", "Pamiętnik", "Romans",
-        "Dla dzieci", "Fantasy", "Horror", "Sci-Fi", "Powieść historyczna",
-        "Bibliografia", "Reportaż", "Powieść młodzieżowa", "Poradnik", "Kucharska"];
-    const found = types.find(type => type === body.type);
-    if(!found){
-        throw new ValidationError('invalid type');
+    if (model === Book) {
+        if (validator.isEmpty(body.type)) {
+            throw new Error('type field cannot be empty')
+        }
+        if (!validator.isLength(body.type, {min: 3, max: 50})) {
+            throw new Error('wrong length of type field');
+        }
+        const types = ['Kryminał', "Dramat", "Pamiętnik", "Romans",
+            "Dla dzieci", "Fantasy", "Horror", "Sci-Fi", "Powieść historyczna",
+            "Bibliografia", "Reportaż", "Powieść młodzieżowa", "Poradnik", "Kucharska"];
+        const foundType = types.find(type => type === body.type);
+        if (!foundType) {
+            throw new Error('invalid type');
+        }
     }
     return true
 }

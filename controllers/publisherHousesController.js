@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const PublishingHouse = require("../models/publishingHouse");
 const Book = require("../models/book");
+const {validateNewObject} = require("../validation/createNewObjectValidation");
 
 
 const getAllPublishingHouses = async (req, res) => {
@@ -13,11 +14,11 @@ const getAllPublishingHouses = async (req, res) => {
 }
 
 const createNewPublishingHouse = async (req, res) => {
-    const publishingHouse = await new PublishingHouse({
-        name: req.body.name
-    });
     try {
-
+        const validateNewPublishingHouse = await validateNewObject(PublishingHouse,req.body);
+        const publishingHouse = await new PublishingHouse({
+            name: req.body.name
+        });
         const data = await publishingHouse.save();
         res.status(201).json(data)
     }
