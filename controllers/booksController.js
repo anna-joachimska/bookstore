@@ -2,7 +2,7 @@ const Book = require("../models/book");
 const mongoose = require("mongoose");
 const Bookstore = require("../models/bookstore");
 const PublishingHouse = require("../models/publishingHouse");
-const {validateNewObject} = require("../validation/publishingHouseValidation");
+const {validateNewObject} = require("../validation/createNewObjectValidation");
 
 const getAllBooks = async (req, res) => {
     try {
@@ -45,8 +45,7 @@ const createNewBook = async (req, res) => {
         res.status(200).json(data)
     }
     catch(error) {
-        console.log(error)
-        res.status(500).json({message: error})
+        res.status(500).json({message: error.message})
     };
 }
 const getBook = async (req, res) => {
