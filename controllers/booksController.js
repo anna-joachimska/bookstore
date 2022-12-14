@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const Bookstore = require("../models/bookstore");
 const PublishingHouse = require("../models/publishingHouse");
 const {validateNewObject} = require("../validation/createNewObjectValidation");
+const {validateObjectUpdate} = require("../validation/updateObjectValidation");
 
 const getAllBooks = async (req, res) => {
     try {
@@ -58,6 +59,7 @@ const updateBook = async (req, res) => {
     try {
         const id = req.params.bookId;
         const dataToUpdate = req.body;
+        const updateBookValidation = await validateObjectUpdate(Book, id, dataToUpdate)
         const options = {new: true}; //obiekt zostanie zwrocony po updacie
         const result = await Book.findByIdAndUpdate(id, dataToUpdate, options)
         res.status(200).send(result);

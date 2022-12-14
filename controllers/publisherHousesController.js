@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const PublishingHouse = require("../models/publishingHouse");
 const Book = require("../models/book");
 const {validateNewObject} = require("../validation/createNewObjectValidation");
+const {validateObjectUpdate} = require("../validation/updateObjectValidation");
 
 
 const getAllPublishingHouses = async (req, res) => {
@@ -40,9 +41,10 @@ const getPublishingHouse = async (req, res) => {
 const updatePublishingHouse = async (req, res) => {
     try {
         const id = req.params.publishingHouseId;
-        const updatedData = req.body;
+        const dataToUpdate = req.body;
+        const updatePublishingHouseValidation = await validateObjectUpdate(PublishingHouse, id, dataToUpdate)
         const options = {new: true};
-        const result = await PublishingHouse.findByIdAndUpdate(id, {updatedData}, options).populate('books');
+        const result = await PublishingHouse.findByIdAndUpdate(id, dataToUpdate, options).populate('books');
         res.status(200).send(result);
     } catch (error) {
         res.status(500).json({message: error.message});

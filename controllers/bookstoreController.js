@@ -3,6 +3,7 @@ const Bookstore = require("../models/bookstore");
 const Book = require('../models/book');
 const PublishingHouse = require('../models/publishingHouse');
 const {validateNewObject} = require("../validation/createNewObjectValidation");
+const {validateObjectUpdate} = require("../validation/updateObjectValidation");
 
 const getAllBookstores = async (req, res) => {
     try {
@@ -56,9 +57,10 @@ const getBookstore = async (req, res) => {
 const updateBookstore = async (req, res) => {
     try {
         const id = req.params.bookstoreId;
-        const updatedData = req.body;
+        const dataToUpdate = req.body;
+        const updateBookstoreValidation = await validateObjectUpdate(Bookstore, id, dataToUpdate)
         const options = {new: true}; //obiekt zostanie zwrocony po updacie
-        const result = await Bookstore.findByIdAndUpdate(id, updatedData, options)
+        const result = await Bookstore.findByIdAndUpdate(id, dataToUpdate, options)
         res.status(200).send(result);
     } catch (error) {
         res.status(500).json({message: error.message});
