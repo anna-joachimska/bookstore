@@ -3,7 +3,8 @@ const PublishingHouse = require("../models/publishingHouse");
 const Book = require("../models/book");
 const {validateNewObject} = require("../validation/createNewObjectValidation");
 const {validateObjectUpdate} = require("../validation/updateObjectValidation");
-
+const {validateObjectDelete} = require("../validation/deleteObjectValidation");
+const {validateAddObjectToPublishingHouse} = require("../validation/addObjectToObject");
 
 const getAllPublishingHouses = async (req, res) => {
     try {
@@ -30,6 +31,7 @@ const createNewPublishingHouse = async (req, res) => {
 
 const getPublishingHouse = async (req, res) => {
     try {
+        if (!req.params.publishingHouseId) return res.status(400).json('id not provided');
         const data = await PublishingHouse.findById(req.params.publishingHouseId).populate('books');
         if (!data) return res.status(404).json('Publishing House not Found')
         res.status(200).json(data);
@@ -53,15 +55,16 @@ const updatePublishingHouse = async (req, res) => {
 
 const deletePublishingHouse = async (req, res) => {
     try {
+        if (!req.params.publishingHouseId) return res.status(400).json('id not provided');
         const publishingHouse = await PublishingHouse.findById(req.params.publishingHouseId);
         if (!publishingHouse) {
             return res.status(404).json({message: 'Publishing House not found'});
         }
-        if (publishingHouse.books.length !== 0) {
-            throw new Error("Can not delete Publishing House with books in it");
+        const validatePublishingHouseDelete = await validateObjectDelete(PublishingHouse, req.params.publishingHouseId)
+        if(validatePublishingHouseDelete) {
+            await PublishingHouse.deleteOne(publishingHouse._id);
+            res.send(`Object ${publishingHouse.name} has been deleted`);
         }
-        const data = await PublishingHouse.findByIdAndDelete(publishingHouse._id);
-        res.send(`Object ${data.name} has been deleted`);
 
     } catch (error) {
         res.status(500).json({message:error.message});
@@ -70,16 +73,14 @@ const deletePublishingHouse = async (req, res) => {
 
 const addBookToPublishingHouse = async (req, res) => {
     try {
-        const publishingHouse = await PublishingHouse.findById(req.params.publishingHouseId);
-        const book = await Book.findOne({name: req.body.books});
-        if(!book) return res.status(404).json({message: 'Book not found'});
-        if (!publishingHouse.books.includes(book._id)) {
+        const validateAddBookToPublishingHouse = await validateAddObjectToPublishingHouse(PublishingHouse, Book, req.params.publishingHouseId, req.body);
+        if (validateAddBookToPublishingHouse) {
+            const publishingHouse = await PublishingHouse.findById(req.params.publishingHouseId);
+            const book = await Book.findOne({name: req.body.books});
             await publishingHouse.books.push(book._id);
             publishingHouse.save();
             return res.send(publishingHouse);
-        };
-
-        throw new Error(`${book.name} was already added to this Publishing House`);
+        }
 
     } catch (error) {
         res.status(500).json({message:error.message});
@@ -88,6 +89,7 @@ const addBookToPublishingHouse = async (req, res) => {
 
 const deleteBookFromPublisherHouse = async (req, res) => {
     try {
+        if (!req.params.publishingHouseId) return res.status(400).json('id not provided');
         const book = await Book.findOne({name: req.body.books});
         if(!book) return res.status(404).json({message: 'Book not found'});
 

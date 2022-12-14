@@ -11,7 +11,7 @@ const bookSchema = mongoose.Schema({
             message: '{VALUE} is not supported'
         },
     },
-    publishingHouse: {type: mongoose.Types.ObjectId, ref: 'PublishingHouse'},
+    publishingHouse: [{type: mongoose.Types.ObjectId, ref: 'PublishingHouse'}],
     bookstores: [{type: mongoose.Types.ObjectId, ref: 'Bookstore'}]
     });
 

@@ -4,6 +4,7 @@ const Bookstore = require("../models/bookstore");
 const PublishingHouse = require("../models/publishingHouse");
 const {validateNewObject} = require("../validation/createNewObjectValidation");
 const {validateObjectUpdate} = require("../validation/updateObjectValidation");
+const {validateAddObjectToBook} = require("../validation/addObjectToObject");
 
 const getAllBooks = async (req, res) => {
     try {
@@ -48,6 +49,7 @@ const createNewBook = async (req, res) => {
 }
 const getBook = async (req, res) => {
     try {
+        if (!req.params.bookId) return res.status(400).json('id not provided');
         const data = await Book.findById(req.params.bookId);
         if (!data) return res.status(404).json('Book not Found')
         res.status(200).json(data);
@@ -57,10 +59,11 @@ const getBook = async (req, res) => {
 }
 const updateBook = async (req, res) => {
     try {
+        if (!req.params.bookId) return res.status(400).json('id not provided');
         const id = req.params.bookId;
         const dataToUpdate = req.body;
         const updateBookValidation = await validateObjectUpdate(Book, id, dataToUpdate)
-        const options = {new: true}; //obiekt zostanie zwrocony po updacie
+        const options = {new: true};
         const result = await Book.findByIdAndUpdate(id, dataToUpdate, options)
         res.status(200).send(result);
     } catch (error) {
@@ -70,6 +73,7 @@ const updateBook = async (req, res) => {
 
 const deleteBook = async (req, res) => {
     try {
+        if (!req.params.bookId) return res.status(400).json('id not provided');
         const id = req.params.bookId;
         const data = await Book.findByIdAndDelete(id);
         if (!data) {
@@ -81,21 +85,17 @@ const deleteBook = async (req, res) => {
         res.status(500).json({message:error.message});
     }
 }
-//?? czy powinny byc
 
 const addBookstoreToBook = async (req, res) => {
     try {
-        const book = await Book.findById(req.params.bookId);
-        const bookstore = await Bookstore.findOne({name: req.body.bookstores});
-        if(!bookstore) return res.status(404).json({message: 'Bookstore not found'});
-        if (!book.bookstores.includes(bookstore._id)) {
+        const validateAddBookstoreToBook = await validateAddObjectToBook(Book, Bookstore, req.params.bookId, req.body);
+        if (validateAddBookstoreToBook) {
+            const book = await Book.findById(req.params.bookId);
+            const bookstore = await Bookstore.findOne({name: req.body.bookstores});
             await book.bookstores.push(bookstore._id);
             book.save();
             return res.send(book);
         };
-
-        throw new Error(`${bookstore.name} was already added to this Book`);
-
     } catch (error) {
         res.status(500).json({message:error.message});
     }
@@ -103,6 +103,7 @@ const addBookstoreToBook = async (req, res) => {
 
 const deleteBookstoreFromBook = async (req, res) => {
     try {
+        if (!req.params.bookId) return res.status(400).json('id not provided');
         const bookstore = await Bookstore.findOne({name: req.body.bookstores});
         if(!bookstore) return res.status(404).json({message: 'Bookstore not found'});
 
@@ -120,17 +121,14 @@ const deleteBookstoreFromBook = async (req, res) => {
 
 const addPublishingHouseToBook = async (req, res) => {
     try {
-        const book = await Book.findById(req.params.bookId);
-        console.log(book.publishingHouse) //nie ma pola publishing house; nie dziala w obie strony referencja
-        const publishingHouse = await PublishingHouse.findOne({name: req.body.publishingHouse});
-        if(!publishingHouse) return res.status(404).json({message: 'Publishing House not found'});
-        if (!book.publishingHouse.includes(publishingHouse._id)) {
+        const validateAddPublishingHouseToBook = await validateAddObjectToBook(Book, PublishingHouse, req.params.bookId, req.body);
+        if (validateAddPublishingHouseToBook) {
+            const book = await Book.findById(req.params.bookId);
+            const publishingHouse = await PublishingHouse.findOne({name: req.body.publishingHouse});
             await book.publishingHouse.push(publishingHouse._id);
             book.save();
-            return res.send(book);
+            return res.send(book)
         };
-
-        throw new Error(`${publishingHouse.name} was already added to this Book`);
 
     } catch (error) {
         res.status(500).json({message:error.message});
@@ -139,6 +137,7 @@ const addPublishingHouseToBook = async (req, res) => {
 
 const deletePublishingHouseFromBook = async (req, res) => {
     try {
+        if (!req.params.bookId) return res.status(400).json('id not provided');
         const publishingHouse = await PublishingHouse.findOne({name: req.body.publishingHouses});
         if(!publishingHouse) return res.status(404).json({message: 'Publishing House not found'});
 
