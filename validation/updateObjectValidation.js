@@ -2,8 +2,8 @@ const validator = require('validator');
 const Book = require('../models/book');
 
 const validateObjectUpdate = async (model, id, body) => {
-    const foundNameInDataBase = await model.findById(id);
-    if (!foundNameInDataBase) {
+    const foundInDataBase = await model.findById(id);
+    if (!foundInDataBase) {
         throw new Error("object doesn't exist in database")
     }
     if(validator.isEmpty(body.name)) {
