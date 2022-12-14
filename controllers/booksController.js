@@ -32,6 +32,7 @@ const getAllBooksWithBookstores = async (req, res) => {
 }
 
 const createNewBook = async (req, res) => {
+    const error = []
     try {
         const validateNewBook = await validateNewObject(req.body);
         if(!validateNewBook) {
