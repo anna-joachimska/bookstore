@@ -13,8 +13,6 @@ mongoose.connect(process.env.DB_CONNECTION, () => console.log('connected to db')
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
-// login package (endpoints in terminal with method, status and time)
-// app.use(morgan('dev'));
 
 // allowing requests from different servers to my server (CORS disabled)
 app.use((req, res, next) => {
