@@ -6,11 +6,11 @@ router.get('/', publishingHousesController.getAllPublishingHouses);
 
 router.post('/', publishingHousesController.createNewPublishingHouse);
 
-router.get('/:publishingHouseId', publishingHousesController.getPublishingHouse);
+router.get('/publishingHouse/:publishingHouseId', publishingHousesController.getPublishingHouse);
 
-router.patch('/:publishingHouseId', publishingHousesController.updatePublishingHouse);
+router.patch('/publishingHouse/:publishingHouseId', publishingHousesController.updatePublishingHouse);
 
-router.delete('/:publishingHouseId', publishingHousesController.deletePublishingHouse);
+router.delete('/publishingHouse/:publishingHouseId', publishingHousesController.deletePublishingHouse);
 
 router.patch('/deleteBookFromPublishingHouse/:publishingHouseId', publishingHousesController.deleteBookFromPublisherHouse);
 

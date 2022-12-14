@@ -10,11 +10,11 @@ router.get('/WithPublishingHouses', bookstoreController.getAllBookstoresWithPubl
 
 router.post('/', bookstoreController.createNewBookstore);
 
-router.get('/:bookstoreId', bookstoreController.getBookstore);
+router.get('/bookstore/:bookstoreId', bookstoreController.getBookstore);
 
-router.patch('/:bookstoreId', bookstoreController.updateBookstore);
+router.patch('/bookstore/:bookstoreId', bookstoreController.updateBookstore);
 
-router.delete('/:bookstoreId', bookstoreController.deleteBookstore);
+router.delete('/bookstore/:bookstoreId', bookstoreController.deleteBookstore);
 
 router.patch('/deleteBookFromBookstore/:bookstoreId', bookstoreController.deleteBookFromBookstore);
 

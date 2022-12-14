@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config();
 const booksRoutes = require('./routes/books');
-const bookstoreRoutes = require('./routes/bookstore');
+const bookstoreRoutes = require('./routes/bookstores');
 const publishingHousesRoutes = require('./routes/publishingHouses');
 const bodyParser = require('body-parser');
 
@@ -28,7 +28,7 @@ app.use((req, res, next) => {
 
 // middleware - routes which should handle requests
 app.use('/books', booksRoutes);
-app.use('/bookstore', bookstoreRoutes);
+app.use('/bookstores', bookstoreRoutes);
 app.use('/publishingHouses', publishingHousesRoutes);
 
 const port = process.env.PORT || 8888;

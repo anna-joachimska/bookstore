@@ -10,11 +10,11 @@ router.get('/WithBookstores', booksController.getAllBooksWithBookstores);
 
 router.post('/', booksController.createNewBook);
 
-router.get('/:bookId', booksController.getBook);
+router.get('/book/:bookId', booksController.getBook);
 
-router.patch('/:bookId', booksController.updateBook);
+router.patch('/book/:bookId', booksController.updateBook);
 
-router.delete('/:bookId', booksController.deleteBook);
+router.delete('/book/:bookId', booksController.deleteBook);
 
 router.patch('/deleteBookstoreFromBook/:bookId', booksController.deleteBookstoreFromBook);
 
