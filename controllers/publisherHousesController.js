@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 const PublishingHouse = require("../models/publishingHouse");
 const Book = require("../models/book");
-const {findByName} = require("../functions/findFunctions");
+
 
 const getAllPublishingHouses = async (req, res) => {
     try {
         const data = await PublishingHouse.find().populate('books');
-        res.json(data);
+        res.status(200).json(data);
     } catch (error) {
         res.status(500).json({message: error.message})
     }
@@ -17,18 +17,20 @@ const createNewPublishingHouse = async (req, res) => {
         name: req.body.name
     });
     try {
+
         const data = await publishingHouse.save();
-        res.status(200).json(data)
+        res.status(201).json(data)
     }
     catch(error) {
-        res.status(400).json({message: error.message})
+        res.status(500).json({message: error.message})
     };
 }
 
 const getPublishingHouse = async (req, res) => {
     try {
-        const data = await PublishingHouse.findById(req.params.publishingHouseId);
-        res.json(data);
+        const data = await PublishingHouse.findById(req.params.publishingHouseId).populate('books');
+        if (!data) return res.status(404).json('Publishing House not Found')
+        res.status(200).json(data);
     } catch (error) {
         res.status(500).json({message: error.message})
     }
@@ -38,48 +40,51 @@ const updatePublishingHouse = async (req, res) => {
     try {
         const id = req.params.publishingHouseId;
         const updatedData = req.body;
-        const options = {new: true}; //obiekt zostanie zwrocony po updacie
-        const result = await PublishingHouse.findByIdAndUpdate(id, {updatedData}, options);
-        console.log(result)
-        res.send(result);
+        const options = {new: true};
+        const result = await PublishingHouse.findByIdAndUpdate(id, {updatedData}, options).populate('books');
+        res.status(200).send(result);
     } catch (error) {
-        res.status(400).json({message: error.message});
+        res.status(500).json({message: error.message});
     }
 }
 
 const deletePublishingHouse = async (req, res) => {
     try {
-        const id = req.params.publishingHouseId;
-        const data = await PublishingHouse.findByIdAndDelete(id);
+        const publishingHouse = await PublishingHouse.findById(req.params.publishingHouseId);
+        if (!publishingHouse) {
+            return res.status(404).json({message: 'Publishing House not found'});
+        }
+        if (publishingHouse.books.length !== 0) {
+            throw new Error("Can not delete Publishing House with books in it");
+        }
+        const data = await PublishingHouse.findByIdAndDelete(publishingHouse._id);
         res.send(`Object ${data.name} has been deleted`);
+
     } catch (error) {
-        res.status(400).json({message:error.message});
+        res.status(500).json({message:error.message});
     }
 }
 
 const addBookToPublishingHouse = async (req, res) => {
     try {
         const publishingHouse = await PublishingHouse.findById(req.params.publishingHouseId);
-        const bookName = req.body.books
-        const newBook = await findByName(Book, bookName)
-        //TODO: do kosza, ten IF jest zbędny + niepoprawny, books nigdy nie jest nullem, zawsze na starcie będzie pustą tablicą
-        if (publishingHouse.books == null || publishingHouse.books.length<1) {
-            publishingHouse.books = []
-        };
-        if (!publishingHouse.books.includes(newBook._id)) {
-            await publishingHouse.books.push(newBook._id);
+        const book = await Book.findOne({name: req.body.books});
+        if(!book) return res.status(404).json({message: 'Book not found'});
+        if (!publishingHouse.books.includes(book._id)) {
+            await publishingHouse.books.push(book._id);
             publishingHouse.save();
             return res.send(publishingHouse);
         };
-        console.log('book is already added in publishing house')
+
+        throw new Error(`${book.name} was already added to this Publishing House`);
+
     } catch (error) {
-        res.status(400).json({message:error.message});
+        res.status(500).json({message:error.message});
     }
 }
 
 const deleteBookFromPublisherHouse = async (req, res) => {
     try {
-
         const book = await Book.findOne({name: req.body.books});
         if(!book) return res.status(404).json({message: 'Book not found'});
 
@@ -91,8 +96,7 @@ const deleteBookFromPublisherHouse = async (req, res) => {
         return res.send(publishingHouse);
 
     } catch (error) {
-        //TODO, popracuj nad odpowiednimi kodami w odpowiedzi i obsługą błędów
-        res.status(400).json({message:error.message});
+        res.status(500).json({message:error.message});
     }
 }
 
