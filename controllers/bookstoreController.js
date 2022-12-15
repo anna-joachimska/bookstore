@@ -4,7 +4,7 @@ const Book = require('../models/book');
 const PublishingHouse = require('../models/publishingHouse');
 const {validateNewObject} = require("../validation/createNewObjectValidation");
 const {validateObjectUpdate} = require("../validation/updateObjectValidation");
-const {validateAddObjectToBookstore} = require("../validation/addObjectToObject");
+const {validateAddObjectToBookstore, validateAddObjectToObject} = require("../validation/addObjectToObject");
 const {validateObjectDelete} = require("../validation/deleteObjectValidation");
 
 const getAllBookstores = async (req, res) => {
@@ -90,7 +90,11 @@ const deleteBookstore = async (req, res) => {
 
 const addBookToBookstore = async (req, res) => {
     try {
-        const validateAddBookToBookstore = await validateAddObjectToBookstore(Bookstore, Book, req.params.bookstoreId, req.body)
+        // STARA WERSJA
+        // const validateAddBookToBookstore = await validateAddObjectToBookstore(Bookstore, Book, req.params.bookstoreId, req.body)
+
+        //PROBA NOWEJ WERSJI
+        const validateAddBookToBookstore = await validateAddObjectToObject(Bookstore, Book, req.params.bookstoreId, req.body)
         if (validateAddBookToBookstore) {
             const bookstore = await Bookstore.findById(req.params.bookstoreId);
             const book = await Book.findOne({name: req.body.books});

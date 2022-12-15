@@ -69,4 +69,32 @@ const validateAddObjectToPublishingHouse = async (PublishingHouse, Book, id, bod
     return true
 }
 
-module.exports={validateAddObjectToBook, validateAddObjectToBookstore,validateAddObjectToPublishingHouse}
+// PROBA OPTYMALIZACJI POWYZSZYCH FUNKCJI (zeby zamiast 3 byla 1 w zaleznosci od parametrow - ale poki co nie znajduje mi tutaj obiektu2)
+const validateAddObjectToObject = async (model1, model2, id, body) => {
+    const object1 = await model1.findById(id);
+    if(!object1){
+        throw new Error(`${model1.name} doesn't exist in database`);}
+    switch(model2){
+        case Book:
+            field = body.books
+            break
+        case Bookstore:
+            field = body.bookstores
+            break
+        case PublishingHouse:
+            if (model1===Book){
+                field = body.publishingHouse}
+            if(model1===Bookstore) {
+                field = body.publishingHouses}
+        }
+    const object2 = await model2.findOne({name:body.field});
+    console.log("object 2", object2)
+    console.log("field", field)
+    if (!object2) {
+        throw new Error(`${object2} doesn't exist in database`)}
+    if(model2.field.includes(object2._id)) {
+        throw new Error (`${object2.name} was already added to this ${model2.name}`)}
+    }
+
+
+module.exports={validateAddObjectToBook, validateAddObjectToBookstore,validateAddObjectToPublishingHouse,validateAddObjectToObject}
