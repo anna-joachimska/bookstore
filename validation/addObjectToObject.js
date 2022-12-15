@@ -87,9 +87,7 @@ const validateAddObjectToObject = async (model1, model2, id, body) => {
             if(model1===Bookstore) {
                 field = body.publishingHouses}
         }
-    const object2 = await model2.findOne({name:body.field});
-    console.log("object 2", object2)
-    console.log("field", field)
+    const object2 = await model2.findOne({name:field});
     if (!object2) {
         throw new Error(`${object2} doesn't exist in database`)}
     if(model2.field.includes(object2._id)) {
