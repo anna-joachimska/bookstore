@@ -90,6 +90,7 @@ const validateAddObjectToObject = async (model1, model2, id, body) => {
     const object2 = await model2.findOne({name:field});
     if (!object2) {
         throw new Error(`${object2} doesn't exist in database`)}
+    // konkretnie tu jest problem bo field ma wartosc a nie books np. i dlatego nie moge zrobic includes
     if(model2.field.includes(object2._id)) {
         throw new Error (`${object2.name} was already added to this ${model2.name}`)}
     }
